@@ -1,13 +1,45 @@
 from tkinter import *
+from tkinter import messagebox
+from random import choice,randint,shuffle
+import pyperclip
 # ---------------------------- PASSWORD GENERATOR ------------------------------- #
+
+def generate_password():
+    letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+    numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+    symbols = ['!', '#', '$', '%', '&', '(', ')', '*', '+']
+
+    password_letters = [choice(letters) for _ in range(randint(8, 10))]
+    password_symbols = [choice(symbols) for _ in range(randint(2, 4))]
+    password_numbers = [choice(numbers) for _ in range(randint(2, 4))]
+
+    password_list = password_letters + password_symbols + password_numbers
+
+    shuffle(password_list)
+
+    password = "".join(password_list)
+    input_pw.insert(0, password)
+
+    pyperclip.copy(password)
 
 # ---------------------------- SAVE PASSWORD ------------------------------- #
 def save_pw():
-    with open("data.txt","a") as data_file:
-        data_file.write(f"{input_web.get()},{input_user.get()}, {input_pw.get()}")
-    input_web.delete(0,END)
-    input_user.delete(0,END)
-    input_pw.delete(0,END)
+    website = input_web.get()
+    email = input_user.get()
+    password = input_pw.get()
+
+    if len(website) == 0 or len(password) == 0:
+        messagebox.showinfo(title="Oops~", message="Please don't leave any field empty")
+    else:
+        is_ok = messagebox.askokcancel(title=website,message=f"These are the details entered: \n\nEmail: {email} "
+                                                     f"\nPassword: {password} \n\nIs it okay to save?")
+
+        if is_ok:
+            with open("data.txt", "a") as data_file:
+                data_file.write(f"{website}, {email}, {password}\n")
+            input_web.delete(0, END)
+            input_pw.delete(0, END)
+
 
 # ---------------------------- UI SETUP ------------------------------- #
 
@@ -41,7 +73,7 @@ password.grid(row=3, column=0)
 input_pw = Entry(width=21)
 input_pw.grid(row=3, column=1)
 
-button_gen = Button(text="Generate Password",highlightthickness=0)
+button_gen = Button(text="Generate Password",highlightthickness=0,command=generate_password)
 button_gen.grid(row=3,column=2)
 
 button_add = Button(text="Add",highlightthickness=0,width=30,command=save_pw)
